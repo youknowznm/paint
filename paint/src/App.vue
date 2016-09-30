@@ -1,23 +1,21 @@
 <template>
   <div id="paint">
     <ul class="controller">
-      <li
-        v-for="controller in controllers"
-        :class="controller">
-      </li>
+      <li class="clear" @click="clear">Clear All<li>
+    </ul>
     </ul>
     <ul class="colors">
       <li
         v-for="color in colors"
         :class="color.name"
         :data-selected="color.name === selectedColor.name ? true : false"
-        @click="selectColor(color.name)">
+        @click="setColor(color.name)">
       </li>
     </ul>
     <canvas
       class="board"
-      width=508
-      height=508
+      :width="boardSideLength"
+      :height="boardSideLength"
       @mousedown="strokeStart"
       @mousemove="strokeInProgress"
       @mouseup="strokeEnd"
@@ -32,73 +30,90 @@ let vue_paint = {
 
   data () {
     return {
-      controllers: [
-        'undo',
-        'redo',
-        'clear',
-      ],
+      boardSideLength: 508,
       colors: [
-        {name: 'black', code: '#222'},
-        {name: 'green', code: '#5cb85c'},
-        {name: 'yellow', code: '#f0ad4e'},
-        {name: 'red', code: '#d9534f'},
-        {name: 'white', code: '#fff'},
+        {
+          name: 'black',
+          regularCode: '#222',
+          opagueCode: 'rgb(189, 189, 189)',
+        },
+        {
+          name: 'green',
+          regularCode: '#5cb85c',
+          opagueCode: 'rgb(206, 234, 206)',
+        },
+        {
+          name: 'yellow',
+          regularCode: '#f0ad4e',
+          opagueCode: 'rgb(251, 231, 202)',
+        },
+        {
+          name: 'red',
+          regularCode: '#d9534f',
+          opagueCode: 'rgb(244, 203, 202)',
+        },
+        {
+          name: 'white',
+          regularCode: '#fff',
+          opagueCode: '#fff',
+        },
       ],
-      painter: null,
+      context: null,
       hasOnGoingStroke: false,
       selectedColor: '',
-      onGoingColorCode: '#eee',
     };
   },
-
-  // created () {
-  //   console.log('caonima');
-  //   this.initPaint()
-  // },
 
   methods: {
     // 初始化画板
     initPainter () {
-      this.painter = this.$el.getElementsByClassName('board')[0].getContext('2d');
-      this.painter.lineCap = 'round';
-      this.painter.lineJoin = 'round';
-      this.painter.lineWidth = 5;
-      this.painter.imageSmoothingEnabled = true;
-      this.selectedColor = this.colors[0];
+      this.context = this.$el.getElementsByClassName('board')[0].getContext('2d');
+      this.context.lineCap = 'round';
+      this.context.lineJoin = 'round';
+      this.context.lineWidth = 5;
+      this.context.imageSmoothingEnabled = true;
+      if (this.selectedColor === '') {
+        this.setColor('black');
+      }
     },
     // 拖拽相关
     strokeStart (evt) {
-      if (this.painter === null) {
+      if (this.context === null) {
         this.initPainter();
       }
       this.hasOnGoingStroke = true;
-      this.painter.beginPath();
-      this.painter.moveTo(evt.offsetX, evt.offsetY);
+      this.context.beginPath();
+      this.context.moveTo(evt.offsetX, evt.offsetY);
     },
     strokeInProgress (evt) {
       if (this.hasOnGoingStroke === true) {
-        this.painter.strokeStyle =
-          this.selectedColor.name === 'white'
-          ? this.onGoingColorCode
-          : this.colors.white.code;
-        this.painter.lineTo(evt.offsetX, evt.offsetY);
-        this.painter.stroke();
+        // mouseup 之前显示为半透明
+        this.context.strokeStyle = this.selectedColor.opagueCode;
+        this.context.lineTo(evt.offsetX, evt.offsetY);
+        this.context.stroke();
       }
     },
     strokeEnd () {
-      this.painter.strokeStyle = this.selectedColor.code;
-      this.painter.stroke();
-      this.painter.closePath();
+      this.context.strokeStyle = this.selectedColor.regularCode;
+      this.context.stroke();
+      this.context.closePath();
+      this.context.save();
       this.hasOnGoingStroke = false;
     },
     strokeOutsideCanvas () {
       this.hasOnGoingStroke = false;
     },
     // 选取颜色
-    selectColor (tarColorName) {
+    setColor (tarColorName) {
       this.selectedColor = (this.colors.find((item) => {
         return item.name === tarColorName;
       }));
+    },
+    // 清除整块画布
+    clear () {
+      try {
+        this.context.clearRect(0, 0, this.boardSideLength, this.boardSideLength);
+      } catch (e) {}
     },
 
   },
@@ -121,6 +136,7 @@ $grey = #eee
 *
   margin 0
   padding 0
+  list-style none
 
 #paint
   position relative
@@ -134,23 +150,13 @@ $grey = #eee
 
     > li
       float left
-      width 20px
       height 20px
+      line-height 20px
       margin-right 12px
       cursor pointer
-      list-style none
-      background no-repeat 0 0
-      background-size 20px 20px
-      opacity .6
-      transition opacity .2s
-      &.undo
-        background-image url("/src/static/ic-undo.png")
-      &.redo
-        background-image url("/src/static/ic-redo.png")
-      &.clear
-        background-image url("/src/static/ic-clear.png")
+      transition all .2s
       &:hover
-        opacity 1
+        text-shadow 0 0 1px $black
 
   .colors
     float right
@@ -164,12 +170,9 @@ $grey = #eee
       border 2px solid $black
       border-radius 50%
       cursor pointer
-      list-style none
-      opacity .6
       transition all .2s
       &[data-selected]
       &:hover
-        opacity 1
         box-shadow 0 0 6px $black
       &.green
         background-color $green

@@ -1,8 +1,8 @@
 # paint
 
-> A Vue.js project
+> 基于 vue 和 canvas 的一个简易画板，通过 localStorage 实现本地的数据持久化
 
-## Build Setup
+## 配置
 
 ``` bash
 # install dependencies
@@ -14,5 +14,3 @@ npm run dev
 # build for production with minification
 npm run build
 ```
-
-For more information see the [docs for vueify](https://github.com/vuejs/vueify).

@@ -1,7 +1,8 @@
 <template>
-  <div id="paint">
+  <div class="paint" :id="paintId">
     <ul class="controller">
-      <li class="clear" @click="clear">Clear All<li>
+      <li @click="clear">Clear All<li>
+      <li @click="loadFromCache">Load From Cache<li>
     </ul>
     </ul>
     <ul class="colors">
@@ -19,7 +20,7 @@
       @mousedown="strokeStart"
       @mousemove="strokeInProgress"
       @mouseup="strokeEnd"
-      @mouseout="strokeOutsideCanvas">
+      @mouseout="strokeEnd">
     </canvas>
   </div>
 </template>
@@ -30,6 +31,7 @@ let vue_paint = {
 
   data () {
     return {
+      paintId: '1',
       boardSideLength: 508,
       colors: [
         {
@@ -67,7 +69,8 @@ let vue_paint = {
   methods: {
     // 初始化画板
     initPainter () {
-      this.context = this.$el.getElementsByClassName('board')[0].getContext('2d');
+      this.canvas = this.$el.getElementsByClassName('board')[0];
+      this.context = this.canvas.getContext('2d');
       this.context.lineCap = 'round';
       this.context.lineJoin = 'round';
       this.context.lineWidth = 5;
@@ -75,6 +78,25 @@ let vue_paint = {
       if (this.selectedColor === '') {
         this.setColor('black');
       }
+    },
+    // 若 localStorage 中已保存，则将其写入一个 Image 对象，画在 canvas 上
+    loadFromCache () {
+      this.initPainter();
+      let canvasCache = localStorage.getItem(this.paintId);
+      if (canvasCache !== undefined) {
+        let img = new Image();
+        img.src = canvasCache;
+        img.onload = () => {
+          this.context.drawImage(img, 0, 0);
+        }
+      }
+    },
+    // 存储当前的 canvas 数据至 localStorage
+    saveToCache () {
+      localStorage.setItem(
+        this.paintId,
+        this.canvas.toDataURL(0, 0, this.boardSideLength, this.boardSideLength)
+      );
     },
     // 拖拽相关
     strokeStart (evt) {
@@ -94,14 +116,12 @@ let vue_paint = {
       }
     },
     strokeEnd () {
-      this.context.strokeStyle = this.selectedColor.regularCode;
-      this.context.stroke();
-      this.context.closePath();
-      this.context.save();
-      this.hasOnGoingStroke = false;
-    },
-    strokeOutsideCanvas () {
-      this.hasOnGoingStroke = false;
+      if (this.hasOnGoingStroke === true) {
+        this.context.strokeStyle = this.selectedColor.regularCode;
+        this.context.stroke();
+        this.hasOnGoingStroke = false;
+        this.saveToCache();
+      }
     },
     // 选取颜色
     setColor (tarColorName) {
@@ -113,9 +133,10 @@ let vue_paint = {
     clear () {
       try {
         this.context.clearRect(0, 0, this.boardSideLength, this.boardSideLength);
-      } catch (e) {}
-    },
+      } catch (e) {
 
+      }
+    },
   },
 
 };
@@ -138,7 +159,7 @@ $grey = #eee
   padding 0
   list-style none
 
-#paint
+.paint
   position relative
   width 510px
   margin 20px auto
@@ -184,10 +205,12 @@ $grey = #eee
         background-color $black
       &.white
         background-color $white
-      &.grey
-        background-color $grey
 
   .board
-    border 1px solid $black
+    margin-top 6px
+    border 1px solid $grey
+    border-radius 5px
+    box-shadow 0 0 4px 4px $grey
+    cursor pointer
 
 </style>

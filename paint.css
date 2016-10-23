@@ -1,0 +1,86 @@
+.canvas-wrapper {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  border: 1px solid #bdbdbd;
+}
+
+.canvas-wrapper * {
+  cursor: pointer;
+  list-style: none;
+}
+
+.doodle-controllers {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+
+.doodle-controllers > li {
+  float: left;
+  width: 24px;
+  height: 24px;
+  opacity: .5;
+  transition: opacity .2s ease-in-out;
+}
+
+.doodle-controllers > li:hover {
+  cursor: pointer;
+  opacity: 1;
+}
+
+.doodle-controllers > li.undo {
+  background: url("./icons/icon-undo.png") no-repeat 2px 2px;
+  background-size: 83.3%;
+}
+
+.doodle-controllers > li.redo {
+  background: url("./icons/icon-redo.png") no-repeat 2px 2px;
+  background-size: 83.3%;
+}
+
+.doodle-controllers > li.clear {
+  background: url("./icons/icon-clear.png") no-repeat 2px 2px;
+  background-size: 83.3%;
+}
+
+.doodle-colors {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  padding: 6px;
+}
+
+.doodle-colors > li {
+  float: left;
+  width: 16px;;
+  height: 16px;
+  margin-left: 6px;
+  border: 2px solid #222;
+  border-radius: 50%;
+  transition: .2s ease-in-out;
+}
+
+.doodle-colors > li:hover,
+.doodle-colors > li.current {
+  box-shadow: 0 0 6px #222;
+}
+.doodle-colors > li[data-color=green] {
+  background-color: #5cb85c;
+}
+.doodle-colors > li[data-color=yellow] {
+  background-color: #f0ad4e;
+}
+.doodle-colors > li[data-color=red] {
+  background-color: #d9534f;
+}
+.doodle-colors > li[data-color=black] {
+  background-color: #222;
+}
+.doodle-colors > li[data-color=white] {
+  background-color: #fff;
+}
+
+.doodle-content {
+  cursor: pointer;
+}

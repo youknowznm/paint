@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <title>paint</title>
     <link rel="stylesheet" href="./paint.css">
-  </head>
-  <body>
+</head>
+<body>
     <div class="canvas-wrapper">
-      <ul class="doodle-colors">
-        <li data-color="black"></li>
-        <li data-color="green"></li>
-        <li data-color="yellow"></li>
-        <li data-color="red"></li>
-        <li data-color="white"></li>
-      </ul>
-      <ul class="doodle-controllers">
-        <li class="undo"></li>
-        <li class="redo"></li>
-        <li class="clear"></li>
-      </ul>
-      <canvas class="doodle-content" width='500' height='500'></canvas>
+        <ul class="doodle-colors">
+            <li data-color="black"></li>
+            <li data-color="green"></li>
+            <li data-color="yellow"></li>
+            <li data-color="red"></li>
+            <li data-color="white"></li>
+        </ul>
+        <ul class="doodle-controllers">
+            <li class="undo"></li>
+            <li class="redo"></li>
+            <li class="clear"></li>
+        </ul>
+        <canvas class="doodle-content" width='500' height='500'></canvas>
     </div>
     <script src="https://cdn.jsdelivr.net/jquery/3.1.1/jquery.min.js"></script>
     <script src="./paint.js"></script>
     <script>
-      window.onload = function() {
-        let canvasEle = $('.doodle-content')[0];
-        let colorsEle = $('.doodle-colors')[0];
-        let controllersEle = $('.doodle-controllers')[0];
-        initCanvas(canvasEle, colorsEle, controllersEle, null);
-      }
+        window.onload = function() {
+            let canvasEle = $('.doodle-content')[0];
+            let colorsEle = $('.doodle-colors')[0];
+            let controllersEle = $('.doodle-controllers')[0];
+            initCanvas(canvasEle, colorsEle, controllersEle, null);
+        }
     </script>
-  </body>
+</body>
 </html>
